@@ -23,23 +23,8 @@ def create_app():
     app.config['SECRET_KEY'] = config.FLASK_SECRET_KEY
     app.config['DEBUG'] = config.DEBUG
     
-    # Initialize database tables
-    print("[APP] Initializing database tables...")
-    try:
-        from scripts.init_member_payouts_table import create_member_payouts_table
-        create_member_payouts_table()
-        print("[APP] ✓ Database tables initialized")
-    except Exception as e:
-        print(f"[APP] ⚠ Skipping member_payouts table: {e}")
-    
-    # Run user management migration
-    print("[APP] Running user management migration...")
-    try:
-        from scripts.run_user_management_migration import run_migration
-        if run_migration():
-            print("[APP] ✓ User management migration completed")
-    except Exception as e:
-        print(f"[APP] ⚠ Skipping user management migration: {e}")
+    # SKIP database initialization for now - can cause issues in serverless
+    # These will be run separately or on-demand
     
     # Configure CORS
     CORS(app, 
