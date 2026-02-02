@@ -106,6 +106,9 @@ def create_app():
     
     return app
 
+# Expose app for serverless runtimes (e.g., Vercel)
+app = create_app()
+
 if __name__ == '__main__':
     app = create_app()
     
