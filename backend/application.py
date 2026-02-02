@@ -96,8 +96,8 @@ def create_app():
     
     return app
 
-# Expose app for serverless runtimes (e.g., Vercel)
-app = create_app()
+# Expose app factory for serverless runtimes (e.g., Vercel)
+# App will be created in api.py and wsgi.py entry points
 
 if __name__ == '__main__':
     app = create_app()
