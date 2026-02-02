@@ -9,6 +9,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config.settings import config
 
+# CORS origins are loaded from environment variables
+
 # Ensure backend/app package directory is importable without name conflict
 app_pkg_dir = Path(__file__).parent / "app"
 sys.path.insert(0, str(app_pkg_dir))
