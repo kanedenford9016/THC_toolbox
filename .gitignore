@@ -66,3 +66,4 @@ output_*.json
 # Deployment
 *.old
 *.backup
+.env*.local
