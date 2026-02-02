@@ -31,30 +31,14 @@ def create_app():
     # SKIP database initialization for now - can cause issues in serverless
     # These will be run separately or on-demand
     
-    # Configure CORS - use resources to apply to all routes
-    # Manual CORS headers
-    @app.after_request
-    def add_cors_headers(response):
-        origin = request.headers.get('Origin')
-        if origin and any(origin == allowed for allowed in config.CORS_ORIGINS):
-            response.headers['Access-Control-Allow-Origin'] = origin
-            response.headers['Access-Control-Allow-Credentials'] = 'true'
-            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        return response
-    
-    # Handle OPTIONS requests for CORS preflight
-    @app.before_request
-    def handle_preflight():
-        if request.method == 'OPTIONS':
-            response = app.make_default_options_response()
-            origin = request.headers.get('Origin')
-            if origin and any(origin == allowed for allowed in config.CORS_ORIGINS):
-                response.headers['Access-Control-Allow-Origin'] = origin
-                response.headers['Access-Control-Allow-Credentials'] = 'true'
-                response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-                response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-            return response
+    # Configure CORS for all routes
+    CORS(
+        app,
+        resources={r"/*": {"origins": config.CORS_ORIGINS}},
+        supports_credentials=True,
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "Authorization"],
+    )
     
     # Configure rate limiting
     limiter = Limiter(
