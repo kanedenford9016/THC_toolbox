@@ -30,9 +30,7 @@ def create_app():
         create_member_payouts_table()
         print("[APP] ✓ Database tables initialized")
     except Exception as e:
-        print(f"[APP] ✗ Could not initialize member_payouts table: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"[APP] ⚠ Skipping member_payouts table: {e}")
     
     # Run user management migration
     print("[APP] Running user management migration...")
@@ -41,9 +39,7 @@ def create_app():
         if run_migration():
             print("[APP] ✓ User management migration completed")
     except Exception as e:
-        print(f"[APP] ⚠ Could not run user management migration: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"[APP] ⚠ Skipping user management migration: {e}")
     
     # Configure CORS
     CORS(app, 

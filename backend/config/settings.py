@@ -37,8 +37,16 @@ class Config:
     AUDIT_LOG_RETENTION_DAYS = int(os.getenv('AUDIT_LOG_RETENTION_DAYS', 30))
     
     # CORS
-    cors_env = os.getenv('CORS_ORIGINS', 'https://thc-toolbox-frontend.vercel.app,https://thc-toolbox.vercel.app')
-    CORS_ORIGINS = cors_env.split(',')
+    cors_env = os.getenv('CORS_ORIGINS', '')
+    if cors_env:
+        CORS_ORIGINS = [origin.strip() for origin in cors_env.split(',')]
+    else:
+        # Fallback: support both old and new frontend URLs
+        CORS_ORIGINS = [
+            'https://thc-toolbox-frontend.vercel.app',
+            'https://thc-toolbox.vercel.app',
+            'http://localhost:3000'
+        ]
     
     @staticmethod
     def validate():
