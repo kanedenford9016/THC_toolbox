@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/app.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ],
+  "env": {
+    "POSTGRES_URL": "@postgres_url",
+    "ENCRYPTION_MASTER_KEY": "@encryption_master_key",
+    "JWT_SECRET": "@jwt_secret",
+    "FLASK_SECRET_KEY": "@flask_secret_key",
+    "TORN_API_BASE_URL": "https://api.torn.com/v2",
+    "RATE_LIMIT_PER_MINUTE": "80"
+  },
+  "crons": [
+    {
+      "path": "/api/archive/run-archival",
+      "schedule": "0 0 1 * *"
+    }
+  ]
+}
