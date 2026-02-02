@@ -3,6 +3,11 @@ import os
 import sys
 from pathlib import Path
 
+# Ensure backend directory is in path for imports
+backend_dir = Path(__file__).parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
@@ -11,9 +16,9 @@ from config.settings import config
 
 # CORS origins are loaded from environment variables
 
-# Ensure backend/app package directory is importable without name conflict
-app_pkg_dir = Path(__file__).parent / "app"
-sys.path.insert(0, str(app_pkg_dir))
+# Ensure backend/modules package directory is importable
+modules_dir = backend_dir / "modules"
+sys.path.insert(0, str(modules_dir))
 
 def create_app():
     """Create and configure the Flask application."""
