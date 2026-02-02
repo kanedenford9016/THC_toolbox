@@ -37,7 +37,8 @@ class Config:
     AUDIT_LOG_RETENTION_DAYS = int(os.getenv('AUDIT_LOG_RETENTION_DAYS', 30))
     
     # CORS
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*').split(',')
+    cors_env = os.getenv('CORS_ORIGINS', 'https://thc-toolbox-frontend.vercel.app,https://thc-toolbox.vercel.app')
+    CORS_ORIGINS = cors_env.split(',')
     
     @staticmethod
     def validate():
