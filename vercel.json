@@ -4,19 +4,12 @@
     {
       "src": "backend/api.py",
       "use": "@vercel/python"
-        },
-        {
-          "src": "frontend/package.json",
-          "use": "@vercel/static-build",
-          "config": {
-            "distDir": "build"
-          }
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/backend/api"
+      "src": "/(.*)",
+      "dest": "backend/api.py"
     }
   ]
 }
