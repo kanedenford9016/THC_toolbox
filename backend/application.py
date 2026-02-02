@@ -8,7 +8,7 @@ backend_dir = Path(__file__).parent
 if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -31,11 +31,30 @@ def create_app():
     # SKIP database initialization for now - can cause issues in serverless
     # These will be run separately or on-demand
     
-    # Configure CORS
-    CORS(app, 
-         origins=config.CORS_ORIGINS,
-         supports_credentials=True,
-         allow_headers=['Content-Type', 'Authorization'])
+    # Configure CORS - use resources to apply to all routes
+    # Manual CORS headers
+    @app.after_request
+    def add_cors_headers(response):
+        origin = request.headers.get('Origin')
+        if origin and any(origin == allowed for allowed in config.CORS_ORIGINS):
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
+    
+    # Handle OPTIONS requests for CORS preflight
+    @app.before_request
+    def handle_preflight():
+        if request.method == 'OPTIONS':
+            response = app.make_default_options_response()
+            origin = request.headers.get('Origin')
+            if origin and any(origin == allowed for allowed in config.CORS_ORIGINS):
+                response.headers['Access-Control-Allow-Origin'] = origin
+                response.headers['Access-Control-Allow-Credentials'] = 'true'
+                response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+                response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            return response
     
     # Configure rate limiting
     limiter = Limiter(

@@ -4,10 +4,11 @@ from datetime import timedelta
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Get the backend directory path and load .env from there
+# Get the backend directory path and load .env files from there
 backend_dir = Path(__file__).parent.parent
-env_path = backend_dir / '.env'
-load_dotenv(dotenv_path=env_path)
+# Load .env first (defaults), then .env.local (overrides)
+load_dotenv(dotenv_path=backend_dir / '.env')
+load_dotenv(dotenv_path=backend_dir / '.env.local', override=True)
 
 class Config:
     """Base configuration class."""
@@ -45,7 +46,9 @@ class Config:
         CORS_ORIGINS = [
             'https://thc-toolbox-frontend.vercel.app',
             'https://thc-toolbox.vercel.app',
-            'http://localhost:3000'
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:3002'
         ]
     
     @staticmethod
