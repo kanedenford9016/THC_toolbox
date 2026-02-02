@@ -1,9 +1,9 @@
 """War session routes."""
 from flask import Blueprint, request, jsonify
-from app.services.auth import token_required
-from app.services.war_session import war_session_service
-from app.services.calculator import calculator_service
-from app.models.models import WarSession, Member, OtherPayment, MemberPayout, AuditLog
+from services.auth import token_required
+from services.war_session import war_session_service
+from services.calculator import calculator_service
+from models.models import WarSession, Member, OtherPayment, MemberPayout, AuditLog
 
 war_bp = Blueprint('war', __name__, url_prefix='/war')
 

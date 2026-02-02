@@ -1,7 +1,7 @@
 """War session management service."""
-from app.models.models import WarSession, Member, AuditLog
-from app.services.torn_api import torn_api_service
-from app.services.auth import auth_service
+from models.models import WarSession, Member, AuditLog
+from services.torn_api import torn_api_service
+from services.auth import auth_service
 from datetime import datetime
 from typing import Dict, Any, cast
 

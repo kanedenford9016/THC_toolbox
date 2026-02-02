@@ -7,8 +7,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from io import BytesIO
 from datetime import datetime
-from app.models.models import WarSession, Member, OtherPayment
-from app.services.calculator import calculator_service
+from models.models import WarSession, Member, OtherPayment
+from services.calculator import calculator_service
 
 # Blue/Gray professional color scheme
 BLUE_DARK = colors.HexColor('#1a365d')

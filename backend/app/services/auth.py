@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import request, jsonify, Request
 from config.settings import config
-from app.services.torn_api import torn_api_service
-from app.models.models import FactionConfig, AuditLog, AdminUser
+from services.torn_api import torn_api_service
+from models.models import FactionConfig, AuditLog, AdminUser
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Any
 

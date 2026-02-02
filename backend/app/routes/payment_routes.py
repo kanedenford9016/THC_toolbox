@@ -1,7 +1,7 @@
 """Other payments routes."""
 from flask import Blueprint, request, jsonify
-from app.services.auth import token_required
-from app.models.models import OtherPayment, AuditLog
+from services.auth import token_required
+from models.models import OtherPayment, AuditLog
 from typing import Dict, Any, cast
 
 payment_bp = Blueprint('payments', __name__, url_prefix='/payments')

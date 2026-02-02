@@ -1,6 +1,6 @@
 """Database models for the application."""
 from config.database import db
-from app.utils.encryption import encryption_service
+from utils.encryption import encryption_service
 from datetime import datetime, timedelta, date
 from config.settings import config
 from typing import Dict, List, Any, Optional, cast

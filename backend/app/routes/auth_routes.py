@@ -1,6 +1,6 @@
 """Authentication routes."""
 from flask import Blueprint, request, jsonify, make_response
-from app.services.auth import auth_service, token_required
+from services.auth import auth_service, token_required
 from datetime import datetime, timedelta
 from config.settings import config
 from typing import Dict, Any, cast
@@ -155,7 +155,7 @@ def verify():
 def list_users():
     """List all admin users (requires authentication)."""
     try:
-        from app.models.models import AdminUser
+        from models.models import AdminUser
         users = AdminUser.get_all()
         return jsonify({
             'users': users
@@ -169,8 +169,8 @@ def list_users():
 def create_user():
     """Create a new admin user with temporary password."""
     try:
-        from app.models.models import AdminUser
-        from app.services.auth import generate_temporary_password
+        from models.models import AdminUser
+        from services.auth import generate_temporary_password
         from werkzeug.security import generate_password_hash
         
         data = request.get_json()
@@ -206,7 +206,7 @@ def create_user():
         )
         
         # Log the creation
-        from app.models.models import AuditLog
+        from models.models import AuditLog
         AuditLog.create(
             action_type='USER_CREATED',
             user_torn_id=request.current_user['torn_id'],  # type: ignore
@@ -231,7 +231,7 @@ def create_user():
 def change_password():
     """Change password for current user."""
     try:
-        from app.models.models import AdminUser
+        from models.models import AdminUser
         from werkzeug.security import generate_password_hash, check_password_hash
         
         data = request.get_json()
@@ -269,7 +269,7 @@ def change_password():
         result = AdminUser.update_password(user.get('username'), new_password_hash, mark_changed=True)  # type: ignore
         
         # Log the password change
-        from app.models.models import AuditLog
+        from models.models import AuditLog
         AuditLog.create(
             action_type='PASSWORD_CHANGED',
             user_torn_id=torn_id,

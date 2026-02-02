@@ -1,7 +1,7 @@
 """Torn API integration service."""
 import requests
 from config.settings import config
-from app.models.models import AuditLog, FactionConfig
+from models.models import AuditLog, FactionConfig
 from datetime import datetime
 
 class TornAPIService:
