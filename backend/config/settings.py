@@ -39,17 +39,21 @@ class Config:
     
     # CORS
     cors_env = os.getenv('CORS_ORIGINS', '')
+    default_origins = [
+        'https://thc-toolbox-frontend.vercel.app',
+        'https://thc-toolbox.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002'
+    ]
     if cors_env:
-        CORS_ORIGINS = [origin.strip() for origin in cors_env.split(',')]
+        env_origins = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
+        # Always merge defaults to avoid accidental production lockout
+        merged = list(dict.fromkeys(env_origins + default_origins))
+        CORS_ORIGINS = merged
     else:
         # Fallback: support both old and new frontend URLs
-        CORS_ORIGINS = [
-            'https://thc-toolbox-frontend.vercel.app',
-            'https://thc-toolbox.vercel.app',
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://localhost:3002'
-        ]
+        CORS_ORIGINS = default_origins
     
     @staticmethod
     def validate():
