@@ -1,5 +1,5 @@
 """Calculator service for war payouts.""" 
-from models.models import Member, OtherPayment, WarSession, MemberPayout, AuditLog
+from modules.models.models import Member, OtherPayment, WarSession, MemberPayout, AuditLog
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Dict, List, Any
 

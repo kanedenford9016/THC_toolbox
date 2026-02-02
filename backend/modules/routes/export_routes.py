@@ -1,8 +1,8 @@
 """Export and archive routes."""
 from flask import Blueprint, request, jsonify, send_file
-from services.auth import token_required
-from services.pdf_report import pdf_report_service
-from models.models import AuditLog
+from modules.services.auth import token_required
+from modules.services.pdf_report import pdf_report_service
+from modules.models.models import AuditLog
 
 export_bp = Blueprint('export', __name__, url_prefix='/export')
 

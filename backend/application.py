@@ -47,11 +47,11 @@ def create_app():
         pass
     
     # Register blueprints
-    from routes.auth_routes import auth_bp
-    from routes.war_routes import war_bp
-    from routes.member_routes import member_bp
-    from routes.payment_routes import payment_bp
-    from routes.export_routes import export_bp, archive_bp
+    from modules.routes.auth_routes import auth_bp
+    from modules.routes.war_routes import war_bp
+    from modules.routes.member_routes import member_bp
+    from modules.routes.payment_routes import payment_bp
+    from modules.routes.export_routes import export_bp, archive_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(war_bp)

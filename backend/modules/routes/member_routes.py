@@ -1,8 +1,8 @@
 """Member routes."""
 from flask import Blueprint, request, jsonify
-from services.auth import token_required
-from services.war_session import war_session_service
-from models.models import Member, FactionConfig, AuditLog
+from modules.services.auth import token_required
+from modules.services.war_session import war_session_service
+from modules.models.models import Member, FactionConfig, AuditLog
 
 member_bp = Blueprint('members', __name__, url_prefix='/members')
 
