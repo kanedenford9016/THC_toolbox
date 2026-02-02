@@ -1,10 +1,17 @@
 """Main Flask application."""
+import os
+import sys
+from pathlib import Path
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config.settings import config
-import os
+
+# Ensure backend/app package directory is importable without name conflict
+app_pkg_dir = Path(__file__).parent / "app"
+sys.path.insert(0, str(app_pkg_dir))
 
 def create_app():
     """Create and configure the Flask application."""
@@ -57,11 +64,11 @@ def create_app():
         pass
     
     # Register blueprints
-    from app.routes.auth_routes import auth_bp
-    from app.routes.war_routes import war_bp
-    from app.routes.member_routes import member_bp
-    from app.routes.payment_routes import payment_bp
-    from app.routes.export_routes import export_bp, archive_bp
+    from routes.auth_routes import auth_bp
+    from routes.war_routes import war_bp
+    from routes.member_routes import member_bp
+    from routes.payment_routes import payment_bp
+    from routes.export_routes import export_bp, archive_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(war_bp)
