@@ -1,6 +1,6 @@
 """Authentication routes."""
 from flask import Blueprint, request, jsonify, make_response
-from services.auth import auth_service, token_required
+from modules.services.auth import auth_service, token_required
 from datetime import datetime, timedelta
 from config.settings import config
 from typing import Dict, Any, cast
