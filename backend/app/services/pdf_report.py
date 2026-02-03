@@ -38,12 +38,24 @@ class PDFReportService:
         if not war_session:
             raise ValueError("War session not found")
         
-        # Get payout data
-        payout_data = calculator_service.calculate_payouts(
-            war_session_id,
-            war_session['total_earnings'],  # type: ignore
-            war_session['price_per_hit']  # type: ignore
-        )
+        # Get payout data - use saved payouts if available, otherwise calculate
+        from models.models import MemberPayout
+        saved_payouts = MemberPayout.get_by_session(war_session_id)
+        
+        if saved_payouts and len(saved_payouts) > 0:
+            # Use saved payouts (fast)
+            payout_data = {
+                'member_payouts': saved_payouts,
+                'total_payout': sum(float(p.get('total_payout', 0)) for p in saved_payouts),
+                'total_hits': sum(int(p.get('hit_count', 0)) for p in saved_payouts),
+            }
+        else:
+            # Fall back to calculation if no saved payouts (slow, for backwards compatibility)
+            payout_data = calculator_service.calculate_payouts(
+                war_session_id,
+                war_session['total_earnings'],  # type: ignore
+                war_session['price_per_hit']  # type: ignore
+            )
         
         # Create PDF buffer
         buffer = BytesIO()

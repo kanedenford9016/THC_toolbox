@@ -174,12 +174,15 @@ def get_history():
 @war_bp.route('/list', methods=['GET'])
 @token_required
 def list_wars():
-    """Get all war sessions for the faction."""
+    """Get all active war sessions for the faction (excludes completed)."""
     try:
         faction_id = request.current_user['faction_id']  # type: ignore
-        sessions = war_session_service.get_faction_wars(faction_id)
+        all_sessions = war_session_service.get_faction_wars(faction_id)
         
-        return jsonify({'wars': sessions}), 200
+        # Filter to only active wars (exclude completed)
+        active_sessions = [s for s in all_sessions if s.get('status') == 'active']
+        
+        return jsonify({'wars': active_sessions}), 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
