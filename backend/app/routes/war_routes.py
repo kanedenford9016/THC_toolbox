@@ -131,6 +131,26 @@ def get_member_payouts(session_id):
         payouts = MemberPayout.get_by_session(session_id)
         print(f"[WAR] Retrieved {len(payouts)} member payouts for war {session_id}")
         
+        # Convert Decimal fields to float for proper JSON serialization
+        for payout in payouts:
+            if 'base_payout' in payout and isinstance(payout['base_payout'], str):
+                try:
+                    payout['base_payout'] = float(payout['base_payout'])
+                except (ValueError, TypeError):
+                    payout['base_payout'] = 0.0
+            
+            if 'bonus_amount' in payout and isinstance(payout['bonus_amount'], str):
+                try:
+                    payout['bonus_amount'] = float(payout['bonus_amount'])
+                except (ValueError, TypeError):
+                    payout['bonus_amount'] = 0.0
+            
+            if 'total_payout' in payout and isinstance(payout['total_payout'], str):
+                try:
+                    payout['total_payout'] = float(payout['total_payout'])
+                except (ValueError, TypeError):
+                    payout['total_payout'] = 0.0
+        
         return jsonify({'member_payouts': payouts}), 200
         
     except Exception as e:

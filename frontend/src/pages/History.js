@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { warService, paymentService } from '../services/api';
+import { warService, paymentService, exportService } from '../services/api';
 import '../App.css';
 
 function History() {
@@ -13,6 +13,7 @@ function History() {
   const [warPayments, setWarPayments] = useState([]);
   const [sortBy, setSortBy] = useState('hits'); // 'hits', 'score', 'name'
   const [expandedWar, setExpandedWar] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetchCompletedWars();
@@ -67,6 +68,20 @@ function History() {
     setWarMembers([]);
     setWarPayments([]);
     setExpandedWar(null);
+  };
+
+  const handleExportPDF = async (war) => {
+    try {
+      setExporting(true);
+      const userName = localStorage.getItem('userName') || 'Administrator';
+      await exportService.exportPDF(war.session_id, userName);
+      setError('');
+    } catch (err) {
+      setError('Failed to export PDF');
+      console.error(err);
+    } finally {
+      setExporting(false);
+    }
   };
 
   const sortMembers = (list) => {
@@ -176,9 +191,17 @@ function History() {
                             <button
                               className="btn btn-primary"
                               onClick={() => expandedWar === war.session_id ? handleCloseDetails() : handleViewDetails(war)}
-                              style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                              style={{ fontSize: '0.875rem', padding: '0.5rem 1rem', marginRight: '0.5rem' }}
                             >
                               {expandedWar === war.session_id ? 'Hide' : 'View'} Details
+                            </button>
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => handleExportPDF(war)}
+                              disabled={exporting}
+                              style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                            >
+                              {exporting ? 'Exporting...' : 'Export PDF'}
                             </button>
                           </td>
                         </tr>
@@ -187,6 +210,22 @@ function History() {
                         {expandedWar === war.session_id && selectedWar && (
                           <tr style={{ backgroundColor: '#f7fafc', borderBottom: '2px solid #e2e8f0' }}>
                             <td colSpan="5" style={{ padding: '1.5rem' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <div>
+                                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#2d3748' }}>{selectedWar.war_name}</h3>
+                                  <p style={{ margin: 0, color: '#718096', fontSize: '0.875rem' }}>
+                                    {formatDate(selectedWar.completed_timestamp)}
+                                  </p>
+                                </div>
+                                <button
+                                  className="btn btn-secondary"
+                                  onClick={() => handleExportPDF(selectedWar)}
+                                  disabled={exporting}
+                                  style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                                >
+                                  {exporting ? 'Exporting...' : 'Export as PDF'}
+                                </button>
+                              </div>
                               <div>
                                 {/* War Summary */}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
