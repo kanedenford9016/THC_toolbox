@@ -132,10 +132,7 @@ function Dashboard({ setIsAuthenticated }) {
 
         {wars.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-            <p style={{ color: '#718096', marginBottom: '1rem' }}>No wars created yet.</p>
-            <button className="btn btn-primary" onClick={handleCreateWar}>
-              Create Your First War
-            </button>
+            <p style={{ color: '#718096' }}>No active wars. Click "Create New War" above to get started.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: '1rem' }}>
