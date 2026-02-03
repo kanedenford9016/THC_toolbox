@@ -182,7 +182,12 @@ def list_wars():
         # Filter to only active wars (exclude completed)
         active_sessions = [s for s in all_sessions if s.get('status') == 'active']
         
-        return jsonify({'wars': active_sessions}), 200
+        response = jsonify({'wars': active_sessions})
+        # Disable caching for this endpoint
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response, 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
