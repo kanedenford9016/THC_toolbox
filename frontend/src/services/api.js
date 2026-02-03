@@ -43,9 +43,19 @@ api.interceptors.response.use(
         await authService.refreshToken();
         return api(originalRequest);
       } catch (refreshError) {
-        // Don't redirect, just reject - let the component handle it
+        // Refresh failed - clear tokens and redirect to login
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
+    }
+
+    // If refresh endpoint itself fails, redirect to login
+    if (error.response?.status === 401 && isAuthEndpoint && originalRequest.url?.includes('/auth/refresh')) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      window.location.href = '/login';
     }
 
     return Promise.reject(error);
