@@ -38,34 +38,12 @@ class PDFReportService:
         if not war_session:
             raise ValueError("War session not found")
         
-        # Try to get saved payouts first, fall back to calculation if none exist
-        saved_payouts = MemberPayout.get_by_session(war_session_id)
-        
-        if saved_payouts:
-            # Use saved payouts
-            payout_data = {
-                'payouts': [
-                    {
-                        'member_id': p['member_id'],
-                        'member_name': p['member_name'],
-                        'attacks': p['attacks'],
-                        'respect': p['respect'],
-                        'effective_hits': p['effective_hits'],
-                        'payout': p['payout']
-                    }
-                    for p in saved_payouts
-                ],
-                'total_effective_hits': sum(p['effective_hits'] for p in saved_payouts),
-                'total_respect': sum(p['respect'] for p in saved_payouts),
-                'total_attacks': sum(p['attacks'] for p in saved_payouts)
-            }
-        else:
-            # Fall back to calculation if no saved payouts
-            payout_data = calculator_service.calculate_payouts(
-                war_session_id,
-                war_session['total_earnings'],  # type: ignore
-                war_session['price_per_hit']  # type: ignore
-            )
+        # Get payout data (recalculate to get all details including respect/effective hits)
+        payout_data = calculator_service.calculate_payouts(
+            war_session_id,
+            war_session['total_earnings'],  # type: ignore
+            war_session['price_per_hit']  # type: ignore
+        )
         
         # Create PDF buffer
         buffer = BytesIO()
