@@ -51,7 +51,7 @@ class Database:
     def get_cursor():
         """Get a database cursor with context manager."""
         with Database.get_connection() as conn:
-            cursor = conn.cursor()
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             try:
                 yield cursor
             finally:

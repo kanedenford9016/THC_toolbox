@@ -129,7 +129,10 @@ def get_member_payouts(session_id):
     """Get all member payouts for a completed war session."""
     try:
         payouts = MemberPayout.get_by_session(session_id)
-        print(f"[WAR] Retrieved {len(payouts)} member payouts for war {session_id}")
+        if payouts:
+            print(f"[WAR] Retrieved {len(payouts)} member payouts for war {session_id}")
+        else:
+            print(f"[WAR] Retrieved 0 member payouts for war {session_id}")
         
         return jsonify({'member_payouts': payouts}), 200
         
