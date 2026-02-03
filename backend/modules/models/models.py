@@ -387,11 +387,16 @@ class MemberPayout:
     
     @staticmethod
     def get_by_session(war_session_id):
+<<<<<<< HEAD
         """Get all member payouts for a war session."""
+=======
+        """Get all member payouts for a war session with member data."""
+>>>>>>> 1cc917a2864a5bb0ee9c375eb1d484411bc2cdf5
         try:
             with db.get_cursor() as cursor:
                 cursor.execute("""
                     SELECT 
+<<<<<<< HEAD
                         mp.payout_id,
                         mp.war_session_id,
                         mp.member_id,
@@ -404,10 +409,42 @@ class MemberPayout:
                         mp.bonus_reason,
                         mp.member_status
                     FROM member_payouts mp
+=======
+                        mp.*,
+                        COALESCE(m.encrypted_hit_count, '') as encrypted_hit_count,
+                        COALESCE(m.encrypted_score, '') as encrypted_score
+                    FROM member_payouts mp
+                    LEFT JOIN members m 
+                        ON mp.war_session_id = m.war_session_id 
+                        AND mp.member_id = m.member_id
+>>>>>>> 1cc917a2864a5bb0ee9c375eb1d484411bc2cdf5
                     WHERE mp.war_session_id = %s
                     ORDER BY mp.name
                 """, (war_session_id,))
                 results = cursor.fetchall()
+                
+                # Decrypt the encrypted fields
+                from modules.services.auth import encryption_service
+                for result in results:
+                    if result.get('encrypted_hit_count'):
+                        try:
+                            result['attacks'] = int(encryption_service.decrypt(result['encrypted_hit_count']))
+                        except:
+                            result['attacks'] = 0
+                    else:
+                        result['attacks'] = 0
+                    
+                    if result.get('encrypted_score'):
+                        try:
+                            result['respect'] = float(encryption_service.decrypt(result['encrypted_score']))
+                        except:
+                            result['respect'] = 0.0
+                    else:
+                        result['respect'] = 0.0
+                    
+                    # Effective hits is the same as attacks for this context
+                    result['effective_hits'] = result['attacks']
+                
                 print(f"[PAYOUT_MODEL] ✓ Retrieved {len(results)} payouts for war {war_session_id}")
                 return results
         except Exception as e:
