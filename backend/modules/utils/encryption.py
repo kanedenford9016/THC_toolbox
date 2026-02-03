@@ -7,16 +7,23 @@ class EncryptionService:
     """Service for encrypting and decrypting sensitive data."""
     
     def __init__(self):
-        """Initialize the encryption service with the master key."""
-        key = config.ENCRYPTION_MASTER_KEY
-        if not key:
-            raise ValueError("ENCRYPTION_MASTER_KEY not set in environment variables")
-        
-        # Ensure the key is properly formatted
-        if isinstance(key, str):
-            key = key.encode()
-        
-        self.cipher = Fernet(key)
+        """Initialize the encryption service."""
+        self._cipher = None
+    
+    @property
+    def cipher(self):
+        """Lazy-load the encryption cipher."""
+        if self._cipher is None:
+            key = config.ENCRYPTION_MASTER_KEY
+            if not key:
+                raise ValueError("ENCRYPTION_MASTER_KEY not set in environment variables")
+            
+            # Ensure the key is properly formatted
+            if isinstance(key, str):
+                key = key.encode()
+            
+            self._cipher = Fernet(key)
+        return self._cipher
     
     def encrypt(self, data):
         """
