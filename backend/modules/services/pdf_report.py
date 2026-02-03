@@ -7,7 +7,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from io import BytesIO
 from datetime import datetime
-from modules.models.models import WarSession, Member, OtherPayment
+from modules.models.models import WarSession, Member, OtherPayment, MemberPayout
 from modules.services.calculator import calculator_service
 
 # Blue/Gray professional color scheme
@@ -38,12 +38,34 @@ class PDFReportService:
         if not war_session:
             raise ValueError("War session not found")
         
-        # Get payout data
-        payout_data = calculator_service.calculate_payouts(
-            war_session_id,
-            war_session['total_earnings'],  # type: ignore
-            war_session['price_per_hit']  # type: ignore
-        )
+        # Try to get saved payouts first, fall back to calculation if none exist
+        saved_payouts = MemberPayout.get_by_session(war_session_id)
+        
+        if saved_payouts:
+            # Use saved payouts
+            payout_data = {
+                'payouts': [
+                    {
+                        'member_id': p['member_id'],
+                        'member_name': p['member_name'],
+                        'attacks': p['attacks'],
+                        'respect': p['respect'],
+                        'effective_hits': p['effective_hits'],
+                        'payout': p['payout']
+                    }
+                    for p in saved_payouts
+                ],
+                'total_effective_hits': sum(p['effective_hits'] for p in saved_payouts),
+                'total_respect': sum(p['respect'] for p in saved_payouts),
+                'total_attacks': sum(p['attacks'] for p in saved_payouts)
+            }
+        else:
+            # Fall back to calculation if no saved payouts
+            payout_data = calculator_service.calculate_payouts(
+                war_session_id,
+                war_session['total_earnings'],  # type: ignore
+                war_session['price_per_hit']  # type: ignore
+            )
         
         # Create PDF buffer
         buffer = BytesIO()
