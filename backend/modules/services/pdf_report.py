@@ -38,12 +38,34 @@ class PDFReportService:
         if not war_session:
             raise ValueError("War session not found")
         
-        # Get payout data (recalculate to get all details including respect/effective hits)
-        payout_data = calculator_service.calculate_payouts(
-            war_session_id,
-            war_session['total_earnings'],  # type: ignore
-            war_session['price_per_hit']  # type: ignore
-        )
+        # Try to use saved payouts first (fast), fall back to calculation if needed
+        saved_payouts = MemberPayout.get_by_session(war_session_id)
+        
+        if saved_payouts and len(saved_payouts) > 0:
+            # Use saved payouts with joined war stats data
+            payout_data = {
+                'payouts': [
+                    {
+                        'member_id': p['member_id'],
+                        'member_name': p['name'],
+                        'attacks': p['attacks'],
+                        'respect': float(p['respect']) if p['respect'] else 0.0,
+                        'effective_hits': float(p['effective_hits']) if p['effective_hits'] else 0.0,
+                        'payout': float(p['total_payout'])
+                    }
+                    for p in saved_payouts
+                ],
+                'total_effective_hits': sum(float(p['effective_hits']) if p['effective_hits'] else 0.0 for p in saved_payouts),
+                'total_respect': sum(float(p['respect']) if p['respect'] else 0.0 for p in saved_payouts),
+                'total_attacks': sum(p['attacks'] for p in saved_payouts)
+            }
+        else:
+            # Fall back to calculation if no saved payouts
+            payout_data = calculator_service.calculate_payouts(
+                war_session_id,
+                war_session['total_earnings'],  # type: ignore
+                war_session['price_per_hit']  # type: ignore
+            )
         
         # Create PDF buffer
         buffer = BytesIO()

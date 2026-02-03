@@ -387,12 +387,21 @@ class MemberPayout:
     
     @staticmethod
     def get_by_session(war_session_id):
-        """Get all member payouts for a war session."""
+        """Get all member payouts for a war session with war stats."""
         try:
             with db.get_cursor() as cursor:
                 cursor.execute("""
-                    SELECT * FROM member_payouts WHERE war_session_id = %s
-                    ORDER BY name
+                    SELECT 
+                        mp.*,
+                        COALESCE(mws.attacks, 0) as attacks,
+                        COALESCE(mws.respect, 0) as respect,
+                        COALESCE(mws.effective_hits, 0) as effective_hits
+                    FROM member_payouts mp
+                    LEFT JOIN member_war_stats mws 
+                        ON mp.war_session_id = mws.war_session_id 
+                        AND mp.member_id = mws.member_id
+                    WHERE mp.war_session_id = %s
+                    ORDER BY mp.name
                 """, (war_session_id,))
                 results = cursor.fetchall()
                 print(f"[PAYOUT_MODEL] ✓ Retrieved {len(results)} payouts for war {war_session_id}")
