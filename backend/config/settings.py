@@ -40,6 +40,7 @@ class Config:
     # CORS
     cors_env = os.getenv('CORS_ORIGINS', '')
     default_origins = [
+        'https://toolboxfront-gray.vercel.app',
         'https://toolboxfront-grz8mw1lw-reddragons-projects-4bb4edcd.vercel.app',
         'https://thc-toolbox-frontend.vercel.app',
         'https://thc-toolbox.vercel.app',
