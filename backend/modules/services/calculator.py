@@ -87,23 +87,25 @@ class CalculatorService:
             remaining_balance=float(remaining_balance.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
         )
         
-        # Delete existing payouts and save new ones
+        # Delete existing payouts and save new ones (using batch insert for speed)
         try:
             MemberPayout.delete_by_session(war_session_id)
-            for mp in member_payouts:
-                MemberPayout.create(
-                    war_session_id=war_session_id,
-                    member_id=mp['member_id'],
-                    torn_id=mp['torn_id'],
-                    name=mp['name'],
-                    hit_count=mp['hit_count'],
-                    base_payout=mp['base_payout'],
-                    bonus_amount=mp['bonus_amount'],
-                    total_payout=mp['total_payout'],
-                    bonus_reason=mp.get('bonus_reason'),
-                    member_status=mp.get('member_status', 'active')
-                )
-            print(f"[CALCULATOR] ✓ Saved {len(member_payouts)} member payouts to database")
+            # Prepare batch data
+            batch_data = [{
+                'war_session_id': war_session_id,
+                'member_id': mp['member_id'],
+                'torn_id': mp['torn_id'],
+                'name': mp['name'],
+                'hit_count': mp['hit_count'],
+                'base_payout': mp['base_payout'],
+                'bonus_amount': mp['bonus_amount'],
+                'total_payout': mp['total_payout'],
+                'bonus_reason': mp.get('bonus_reason'),
+                'member_status': mp.get('member_status', 'active')
+            } for mp in member_payouts]
+            
+            MemberPayout.batch_create(batch_data)
+            print(f"[CALCULATOR] ✓ Saved {len(member_payouts)} member payouts to database (batch)")
         except Exception as e:
             print(f"[CALCULATOR] ⚠ Could not save member payouts to database: {e}")
             import traceback

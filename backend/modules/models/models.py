@@ -429,6 +429,49 @@ class MemberPayout:
         except Exception as e:
             print(f"[PAYOUT_MODEL] ✗ Error deleting payouts: {e}")
             raise
+    
+    @staticmethod
+    def batch_create(payouts):
+        """Batch insert multiple member payouts efficiently."""
+        if not payouts:
+            return 0
+        
+        try:
+            with db.get_cursor() as cursor:
+                # Build values list for batch insert
+                values = []
+                for mp in payouts:
+                    values.append((
+                        mp['war_session_id'],
+                        mp['member_id'],
+                        mp['torn_id'],
+                        mp['name'],
+                        mp['hit_count'],
+                        mp['base_payout'],
+                        mp['bonus_amount'],
+                        mp['total_payout'],
+                        mp.get('bonus_reason'),
+                        mp.get('member_status', 'active')
+                    ))
+                
+                # Execute batch insert using execute_values for efficiency
+                from psycopg2.extras import execute_values
+                execute_values(
+                    cursor,
+                    """
+                    INSERT INTO member_payouts 
+                    (war_session_id, member_id, torn_id, name, hit_count, base_payout, 
+                     bonus_amount, total_payout, bonus_reason, member_status)
+                    VALUES %s
+                    """,
+                    values
+                )
+                count = len(values)
+                print(f"[PAYOUT_MODEL] ✓ Batch inserted {count} payouts")
+                return count
+        except Exception as e:
+            print(f"[PAYOUT_MODEL] ✗ Error batch creating payouts: {e}")
+            raise
 
 
 class AuditLog:
