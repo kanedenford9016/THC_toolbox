@@ -225,7 +225,7 @@ class AuthService:
 
 
 def token_required(f):
-    """Decorator to require valid JWT token for routes."""
+    """Decorator to require valid JWT access token for routes."""
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
@@ -254,10 +254,14 @@ def token_required(f):
         if not payload:
             return jsonify({'error': 'Invalid token'}), 401
         
+        # Verify token type is 'access' (not 'refresh')
+        if payload.get('type') != 'access':
+            return jsonify({'error': 'Invalid token type. Expected access token'}), 401
+        
         # Check session activity
         torn_id = payload.get('torn_id')
         if not AuthService.check_session_activity(torn_id):
-            return jsonify({'error': 'Session expired due to inactivity'}), 401
+            return jsonify({'error': 'Session expired due to inactivity. Please login again'}), 401
         
         # Update last activity
         AuthService.update_activity(torn_id)
