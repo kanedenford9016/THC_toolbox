@@ -475,35 +475,31 @@ class MemberPayout:
         
         try:
             with db.get_cursor() as cursor:
-                # Build data for executemany
-                data = [(
-                    mp['war_session_id'],
-                    mp['member_id'],
-                    mp['torn_id'],
-                    mp['name'],
-                    mp['hit_count'],
-                    mp['base_payout'],
-                    mp['bonus_amount'],
-                    mp['total_payout'],
-                    mp.get('bonus_reason'),
-                    mp.get('member_status', 'active')
-                ) for mp in payouts]
-                
-                # Execute batch insert using executemany
-                cursor.executemany(
-                    """
-                    INSERT INTO member_payouts 
-                    (war_session_id, member_id, torn_id, name, hit_count, base_payout, 
-                     bonus_amount, total_payout, bonus_reason, member_status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """,
-                    data
-                )
-                count = len(data)
-                print(f"[PAYOUT_MODEL] ✓ Batch inserted {count} payouts")
+                # Use individual inserts but batch them in a transaction
+                count = 0
+                for mp in payouts:
+                    cursor.execute("""
+                        INSERT INTO member_payouts 
+                        (war_session_id, member_id, torn_id, name, hit_count, base_payout, 
+                         bonus_amount, total_payout, bonus_reason, member_status)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        mp['war_session_id'],
+                        mp['member_id'],
+                        mp['torn_id'],
+                        mp['name'],
+                        mp['hit_count'],
+                        mp['base_payout'],
+                        mp['bonus_amount'],
+                        mp['total_payout'],
+                        mp.get('bonus_reason'),
+                        mp.get('member_status', 'active')
+                    ))
+                    count += 1
+                print(f"[PAYOUT_MODEL] ✓ Inserted {count} payouts")
                 return count
         except Exception as e:
-            print(f"[PAYOUT_MODEL] ✗ Error batch creating payouts: {e}")
+            print(f"[PAYOUT_MODEL] ✗ Error creating payouts: {e}")
             raise
 
 
